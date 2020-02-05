@@ -1,20 +1,21 @@
 package data;
 
+import callpackets.AudioPacket;
 import helper.SoundReceiver;
 
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 
-/*
-Go to the main Class for tester code
-@author :  Kunal Anand
- */
+
 
 
 public class AudioCall implements Runnable{
@@ -37,43 +38,39 @@ public class AudioCall implements Runnable{
             microphone = (TargetDataLine) AudioSystem.getLine(info);
             microphone.open(format);
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             int numBytesRead;
-            int CHUNK_SIZE = 1024;
-            byte[] data = new byte[microphone.getBufferSize() / 5];
+            int CHUNK_SIZE = 1024*8;
+            byte[] data = new byte[CHUNK_SIZE];
             microphone.start();
-
-
-            Thread thread = new Thread(new SoundReceiver());
-            thread.start();
 
             // Configure the ip and port
 
             String hostname = "localhost";
-            int port = 5500;
+            int port = 6678;
 
 
             InetAddress address = InetAddress.getByName(hostname);
-            byte[] buffer = new byte[1024];
 
             while (true) {
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                System.out.println(timestamp);
                 DatagramSocket socket = new DatagramSocket();
-
-                //send the receiver username to server
-             //   out.write(username.getBytes(), 0, username.length());
-              //  DatagramPacket packet = new DatagramPacket(username.getBytes(), username.length(), address, port);
-             //   socket.send(packet);
-
-                //get the audio message from microphone
+                long time = System.nanoTime();
                 numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
-                out.write(data, 0, numBytesRead);
-
-                //send the message to server
-                DatagramPacket request = new DatagramPacket(data, numBytesRead, address, port);
+                time = System.nanoTime() - time;
+                System.out.println("Time " + time);
+                AudioPacket audioPacket = new AudioPacket(data,timestamp,
+                        "me", "me", false);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+                objectOutputStream.writeObject(audioPacket);
+                objectOutputStream.flush();
+                byte []packs = out.toByteArray();
+                System.out.println(packs.length);
+                DatagramPacket request = new DatagramPacket(packs, packs.length, address, port);
                 socket.send(request);
-
                 socket.close();
-
+               // sleep(50);
             }
 
 

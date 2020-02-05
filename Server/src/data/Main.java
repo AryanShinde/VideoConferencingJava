@@ -1,5 +1,6 @@
 package data;
 
+import callpackets.VideoPacket;
 import com.github.sarxos.webcam.Webcam;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -11,9 +12,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageConsumer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 
 public class Main {
 
@@ -27,10 +30,12 @@ public class Main {
         Thread thread = new Thread(new AudioCall("anandkunal241"));
         thread.start();
 
-        while(true){
+       while(true){
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             ima=webcam.getImage() ;
             //Image card = SwingFXUtils.toFXImage(ima, null );
-            ByteArrayOutputStream baos=new ByteArrayOutputStream(1000);
+            ByteArrayOutputStream baos=new ByteArrayOutputStream(200000);
+
             try {
                 ImageIO.write(ima,"jpg",baos);
                 baos.flush();
@@ -40,25 +45,31 @@ public class Main {
             //byte[] data = baos.toByteArray();
             byte []data=baos.toByteArray();
 
-
-
+            VideoPacket videoPacket = new VideoPacket(data, timestamp,"me","me",false);
 
             try {
+                ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+
+                ObjectOutputStream oos = new ObjectOutputStream(baos2);
+                oos.writeObject(videoPacket);
+                byte[] pack = baos2.toByteArray();
 
                 DatagramSocket ds = new DatagramSocket();
 
                 InetAddress ip=InetAddress.getByName("localhost");
-                DatagramPacket dp=new DatagramPacket(data,data.length,ip,5000);
+                DatagramPacket dp=new DatagramPacket(pack,pack.length,ip,6679);
                 ds.send(dp);
                 ds.close();
-
 
             }
             catch(IOException e){
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-        }}
+       }
+}
 
 
 

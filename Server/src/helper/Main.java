@@ -38,7 +38,7 @@ public class Main extends Application {
         //ImageIO.write(webcam.getImage(),"JPG", new File("out.jpg"));
 
         //System.out.println("Saved");
-        launch(args);
+       // launch(args);
         Thread listener = new Thread(new SoundReceiver());
         listener.start();
     }
