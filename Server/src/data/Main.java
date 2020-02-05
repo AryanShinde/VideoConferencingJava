@@ -1,3 +1,5 @@
+package data;
+
 import com.github.sarxos.webcam.Webcam;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -21,6 +23,9 @@ public class Main {
         webcam.setViewSize(new Dimension(640 , 480));
         webcam.open();
         BufferedImage ima;
+
+        Thread thread = new Thread(new AudioCall("anandkunal241"));
+        thread.start();
 
         while(true){
             ima=webcam.getImage() ;
