@@ -2,7 +2,6 @@ import com.github.sarxos.webcam.Webcam;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -25,22 +24,31 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import static javafx.application.Application.launch;
-
 public class Main extends Application {
     static Image card;
-    static Webcam webcam;
+    static Webcam webcam;static {
+        Webcam.setAutoOpenMode(true);
+    }
     public static void main(String[] args) throws IOException {
+        webcam=Webcam.getDefault();
 
-     /*   Dimension dim[]=webcam.getViewSizes();
-        int i;
-        for(Dimension d: dim)
-        {
-            System.out.println(d.toString());
-        }*/
-        //ImageIO.write(webcam.getImage(),"JPG", new File("out.jpg"));
-
-        //System.out.println("Saved");
+//        System.out.println(Webcam.getWebcams());
+//
+//
+//        if (webcam != null) {
+//            System.out.println("Webcam: " + webcam.getName());
+//        } else {
+//            System.out.println("No webcam detected");
+//        }
+//       Dimension dim[]=webcam.getViewSizes();
+//        int i;
+//        for(Dimension d: dim)
+//        {
+//            System.out.println(d.toString());
+//            System.out.println(webcam.getImage());
+//        }
+//        ImageIO.write(webcam.getImage(),"JPG", new File("out.jpg"));
+//        System.out.println("Saved");
         launch(args);
     }
     public void start (Stage primary) throws InterruptedException, SocketException {
@@ -77,6 +85,7 @@ public class Main extends Application {
                             e.printStackTrace();
 
                         }
+                        assert buf != null;
                         card = SwingFXUtils.toFXImage(buf, null );
                         label.setGraphic(new ImageView(card));
                     }

@@ -22,7 +22,16 @@ public class Main {
 
     public static void main(String[] args) {
         Webcam webcam;
-        webcam = Webcam.getDefault();
+
+        webcam=Webcam.getDefault();
+        System.out.println(Webcam.getWebcams());
+
+
+        if (webcam != null) {
+            System.out.println("Webcam: " + webcam.getName());
+        } else {
+            System.out.println("No webcam detected");
+        }
         webcam.setViewSize(new Dimension(640 , 480));
         webcam.open();
         BufferedImage ima;
