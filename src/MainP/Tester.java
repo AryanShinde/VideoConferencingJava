@@ -1,3 +1,7 @@
+package MainP;
+
+import MainP.SoundReceiver;
+
 public class Tester {
     public static void main(String []args)
     {

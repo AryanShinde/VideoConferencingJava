@@ -55,6 +55,7 @@ public class Main extends Application {
         primary.show();
         int k=50;
         DatagramSocket ds=new DatagramSocket(5000);
+        System.out.println(ds.isConnected());
         Timeline time = new Timeline(
                 new KeyFrame(Duration.millis(50), new EventHandler<ActionEvent>() {
                     @Override
@@ -66,11 +67,6 @@ public class Main extends Application {
                             DatagramPacket dp=new DatagramPacket(data,30000);
                             ds.receive(dp);
                             buf=ImageIO.read(new ByteArrayInputStream(data));
-
-
-
-
-
 
                         } catch ( IOException e) {
                             e.printStackTrace();

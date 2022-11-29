@@ -11,19 +11,21 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageConsumer;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Webcam webcam;
 
-        webcam=Webcam.getDefault();
+        webcam= Webcam.getWebcams().get(0);
         System.out.println(Webcam.getWebcams());
 
 
@@ -38,20 +40,25 @@ public class Main {
 
         Thread thread = new Thread(new AudioCall("anandkunal241"));
         thread.start();
-
+        boolean flag =true;
        while(true){
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             ima=webcam.getImage() ;
-            //Image card = SwingFXUtils.toFXImage(ima, null );
+
+           if(flag){
+               flag=false;
+               ImageIO.write(webcam.getImage(),"JPG", new File("out.jpg"));
+               System.out.println("Saved");
+           }
             ByteArrayOutputStream baos=new ByteArrayOutputStream(200000);
 
             try {
+                System.out.println(ima);
                 ImageIO.write(ima,"jpg",baos);
                 baos.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //byte[] data = baos.toByteArray();
             byte []data=baos.toByteArray();
 
             VideoPacket videoPacket = new VideoPacket(data, timestamp,"me","me",false);
@@ -62,13 +69,12 @@ public class Main {
                 ObjectOutputStream oos = new ObjectOutputStream(baos2);
                 oos.writeObject(videoPacket);
                 byte[] pack = baos2.toByteArray();
-
                 DatagramSocket ds = new DatagramSocket();
 
                 InetAddress ip=InetAddress.getByName("localhost");
-                DatagramPacket dp=new DatagramPacket(pack,pack.length,ip,6679);
+                System.out.println(ip);
+                DatagramPacket dp=new DatagramPacket(pack,pack.length,ip,5000);
                 ds.send(dp);
-                ds.close();
 
             }
             catch(IOException e){
@@ -78,6 +84,7 @@ public class Main {
             }
 
        }
+
 }
 
 
